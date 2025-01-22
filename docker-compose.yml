@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: DockerfileFrontendRGC
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      CHOKIDAR_USEPOLLING: "true" # Corregido el formato de la variable de entorno
+    networks:
+      - redwebRGC
+    container_name: frontendRGC
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: DockerfileBackendRGC
+    command: bash -c "composer install && php -S 0.0.0.0:8000 -t public"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - redwebRGC
+    container_name: backendRGC
+
+  web:
+    build:
+      context: ./web
+      dockerfile: DockerfileWebRGC
+    ports:
+      - "80:80" # Cambia el puerto externo si tienes conflictos
+    networks:
+      - redwebRGC
+    container_name: webRGC
+
+networks:
+  redwebRGC:
+    driver: bridge
